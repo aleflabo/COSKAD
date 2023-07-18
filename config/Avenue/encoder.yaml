@@ -1,0 +1,90 @@
+split: 'train'
+debug: False  
+accelerator: 'gpu'
+device: 'cuda' # device to use; choices ['cuda', 'cpu']
+devices: [0,1]
+seed: 999
+data_dir: '/media/odin/data_anomaly/anomaly_detection/HR_AVENUE'
+exp_dir: './checkpoints'
+dir_name: 'STSE_hyperbolic_static_non-linear_projector' # reg:1e-3_robust_epochs:10_segLen:8_bSize:512_dropout:0_latent:512
+num_coords: 2
+create_experiment_dir: True
+pretrained: False
+test_path: '/media/odin/data_anomaly/anomaly_detection/HR_AVENUE/testing'
+dropout: 0
+conv_oper: 'sagc'
+act: 'relu'
+pad_size: 10
+load_ckpt: ''
+h_dim: 64
+latent_dim: 16
+validation: True
+projector: 'mlp' # choices ['linear', 'mlp']
+
+
+### Model's configuration
+use_decoder: False
+use_vae: False
+self_minimization: False
+hyperbolic: True
+static_center: True
+
+use_hr: False # just for test
+
+### Hyperparameters for the losses
+alpha: 0.000001 # weight of the regularisation term
+lambda_: 0.01 # weight of the reconstruction loss
+center_tolerance: 0.001 # clip to `center_tolerance` center's values less than `center_tolerance`
+distance: 'euclidean' # how to compute the distance from the center; choices ['euclidean', 'mahalanobis']
+channels: [32,16,32] # channels for the encoder
+
+#dataset args
+dataset_path_to_robust: '/media/odin/data_anomaly/anomaly_detection/morais/Avenue'
+dataset_headless: False
+dataset_choice: 'HR-Avenue'
+dataset_seg_len: 12
+dataset_seg_stride: 1
+dataset_start_offset: 0
+dataset_num_transform: 5
+dataset_symm_range: True
+dataset_return_indices: False
+dataset_sub_mean: False
+dataset_vid_res: [640,360]
+dataset_normalize_pose: True
+dataset_kp18_format: False
+dataset_batch_size: 512
+dataset_hip_center: False
+dataset_num_workers: 8
+dataset_normalization_strategy: 'robust'
+dataset_use_fitted_scaler: False
+dataset_kp_th: 0
+dataset_seg_th: 0
+dataset_to_pow: False
+dataset_double_item: False
+
+# ae args
+ae_act: 'relu'
+ae_fn: ''
+max_epochs: 100
+ae_epochs: 50
+
+# sched&optim args
+opt_optimizer: 'adam'
+opt_scheduler: 'tri'
+opt_lr: 0.0001
+opt_lr_decay: 0.99
+opt_weight_decay: 0.00001
+
+### WANDB configuration
+use_wandb: True
+project_name: "coskad"
+wandb_entity: "pinlab-sapienza"
+group_name: "avenue"
+
+#postprocessing args
+smoothing: 50
+
+#visualization args
+viz_gif_folder: os.path.join(default_data_dir, 'viz')
+
+

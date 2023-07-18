@@ -1,0 +1,95 @@
+### Environment configuration
+split: 'train' # data split; choices ['train', 'test']
+debug: False  
+accelerator: 'gpu'
+device: 'cuda' # device to use; choices ['cuda', 'cpu']
+devices: [1] # indices of cuda devices to use
+seed: 999
+data_dir: '/media/odin/stdrr/data/UBnormal' # '/path_to_ubnormal'
+exp_dir: '/media/odin/stdrr/projects/anomaly_detection/code/COSKAD/models/ablation' # '/path_to_your_experiment_dir'
+dir_name: 'STSE_euclidean_plain_gcn_2' # 'STSE_{identifiers_of_your_experiment}'
+num_coords: 2
+create_experiment_dir: True
+test_path: '/media/odin/stdrr/data/UBnormal/testing/test_frame_mask' # '/path_to_the_test_masks'
+load_ckpt: '' # '/path_to_model's_checkpoint'
+validation: True # use validation
+
+
+### Model's configuration
+use_decoder: False
+use_vae: False
+self_minimization: False
+hyperbolic: False
+static_center: False
+
+use_hr: False # just for test
+
+pretrained: False
+dropout: 0 # probability of dropout
+act: 'relu' # activation function
+pad_size: -1 # size of the padding 
+channels: [32,16,32] # channels for the encoder
+h_dim: 64 # dimension of the bottleneck at the end of the encoder
+latent_dim: 16 # dimension of the latent space
+projector: 'mlp' # choices ['linear', 'mlp']
+encoder_type: 'Learnable_GCN' # type of the encoder
+
+
+### Hyperparameters for the losses
+alpha: 0.000001 # weight of the regularisation term
+lambda_: 0.01 # weight of the reconstruction loss
+center_tolerance: 0.001 # clip to `center_tolerance` center's values less than `center_tolerance`
+distance: 'euclidean' # how to compute the distance from the center; choices ['euclidean', 'mahalanobis']
+
+
+### Dataset's configuration
+dataset_path_to_robust: '/media/odin/stdrr/data/UBnormal' # '/path_to_data_files_in_the_format_of_Morais'
+dataset_headless: False
+dataset_choice: 'UBnormal'
+dataset_seg_len: 12
+dataset_seg_stride: 1
+dataset_start_offset: 0
+dataset_num_transform: 5
+dataset_symm_range: True
+dataset_return_indices: False
+dataset_sub_mean: False
+dataset_vid_res: [1080,720]
+dataset_normalize_pose: True
+dataset_kp18_format: False
+dataset_batch_size: 2048
+dataset_hip_center: False
+dataset_num_workers: 8
+dataset_normalization_strategy: 'robust' # use 'none' to avoid normalization, 'robust' otherwise
+dataset_use_fitted_scaler: False
+dataset_kp_th: 0
+dataset_seg_th: 0
+dataset_double_item: False
+
+
+### ae args
+ae_act: 'relu'
+ae_fn: ''
+ae_test_every: 20
+ae_epochs: 100
+
+
+### Optimizer and scheduler's configuration
+opt_optimizer: 'adam'
+opt_scheduler: 'tri'
+opt_lr: 0.0001
+opt_lr_decay: 0.99
+opt_weight_decay: 0.00001
+
+### WANDB configuration
+use_wandb: True
+project_name: "COSKAD"
+wandb_entity: "stdrr"
+group_name: "ablation"
+
+
+### Post-processing configuration
+smoothing: 50
+
+
+### Visualization's configuration
+viz_gif_folder: '/path_to_visualization_folder'
