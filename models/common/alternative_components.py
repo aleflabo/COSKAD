@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import torch
@@ -14,7 +14,7 @@ from models.graph_layers.stsgcn import CNN_layer
 class EncoderSTGCN(BaseEncoder):
     
     def __init__(self, input_dim:int, layer_channels:List[int], hidden_dimension:int, 
-                 n_frames:int, n_joints:int, dropout:float) -> None:
+                 n_frames:int, n_joints:int, dropout:float, device:Union[str, torch.DeviceObjType]='cpu') -> None:
         """
         Class that implements a Spatial-Temporal Graph Convolutional Encoder (ST-GCN).
 
@@ -25,13 +25,14 @@ class EncoderSTGCN(BaseEncoder):
             n_frames (int): number of frames in the sequence, only for compatibility with other encoders
             n_joints (int): number of body joints, only for compatibility with other encoders
             dropout (float): dropout probability
+            device (Union[str, torch.DeviceObjType]): device on which to run the model's computations. Defaults to 'cpu'.
         """
         
         self.headless = False
         self.fig_per_seq = 1
         
         # Call the parent class constructor and build the model
-        super().__init__(input_dim, layer_channels, hidden_dimension, n_frames, n_joints, dropout, bias=False)
+        super().__init__(input_dim, layer_channels, hidden_dimension, n_frames, n_joints, dropout, bias=False, device=device)
         
         
     def build_model(self):
@@ -44,7 +45,7 @@ class EncoderSTGCN(BaseEncoder):
         self.graph = Graph(**graph_args)
         
         # Initialize the adjacency matrix
-        A = torch.tensor(self.graph.A, dtype=torch.float32, requires_grad=False)
+        A = torch.tensor(self.graph.A, dtype=torch.float32, requires_grad=False, device=self.device)
         self.register_buffer('A', A)
         
         # Set the kernel size and the batch normalization layer
@@ -67,7 +68,7 @@ class EncoderSTGCN(BaseEncoder):
         self.st_gcn_enc = nn.ModuleList(st_gcn_enc)
         
         # Set the importance of each edge
-        self.ei_enc = nn.ParameterList([nn.Parameter(torch.ones(self.A.size())) for _ in self.st_gcn_enc])
+        self.ei_enc = nn.ParameterList([nn.Parameter(torch.ones(self.A.size(), device=self.device)) for _ in self.st_gcn_enc])
 
     
     def encode(self, X:torch.Tensor) -> torch.Tensor:
@@ -121,7 +122,7 @@ class EncoderSTGCN(BaseEncoder):
 class EncoderLearnablePlainGCN(BaseEncoder):
     
     def __init__(self, input_dim:int, layer_channels:List[int], hidden_dimension:int, 
-                 n_frames:int, n_joints:int, dropout:float, bias:bool=True) -> None:
+                 n_frames:int, n_joints:int, dropout:float, bias:bool=True, device:Union[str, torch.DeviceObjType]='cpu') -> None:
         """
         Class that implements a Graph Convolutional Encoder with learnable adjacency matrix.
 
@@ -133,10 +134,11 @@ class EncoderLearnablePlainGCN(BaseEncoder):
             n_joints (int): number of body joints
             dropout (float): dropout probability
             bias (bool, optional): if True, add bias in the convolutional operations. Defaults to True.
+            device (Union[str, torch.DeviceObjType]): device on which to run the model's computations. Defaults to 'cpu'.
         """
         
         # Call the parent class constructor and build the model
-        super().__init__(input_dim, layer_channels, hidden_dimension, n_frames, n_joints, dropout, bias)
+        super().__init__(input_dim, layer_channels, hidden_dimension, n_frames, n_joints, dropout, bias, device)
         
     
     def build_model(self) -> None:
@@ -183,7 +185,7 @@ class EncoderLearnablePlainGCN(BaseEncoder):
 class EncoderStaticPlainGCN(BaseEncoder):
     
     def __init__(self, input_dim:int, layer_channels:List[int], hidden_dimension:int, 
-                 n_frames:int, n_joints:int, dropout:float, bias:bool=True) -> None:
+                 n_frames:int, n_joints:int, dropout:float, bias:bool=True, device:Union[str, torch.DeviceObjType]='cpu') -> None:
         """
         Class that implements a Graph Convolutional Encoder with static adjacency matrix.
 
@@ -195,10 +197,11 @@ class EncoderStaticPlainGCN(BaseEncoder):
             n_joints (int): number of body joints
             dropout (float): dropout probability
             bias (bool, optional): if True, add bias in the convolutional operations. Defaults to True.
+            device (Union[str, torch.DeviceObjType]): device on which to run the model's computations. Defaults to 'cpu'.
         """
         
         # Call the parent class constructor and build the model
-        super().__init__(input_dim, layer_channels, hidden_dimension, n_frames, n_joints, dropout, bias)
+        super().__init__(input_dim, layer_channels, hidden_dimension, n_frames, n_joints, dropout, bias, device)
         
         
     def build_model(self) -> None: 
@@ -212,18 +215,18 @@ class EncoderStaticPlainGCN(BaseEncoder):
             Adj[i,j] = 1.0
             Adj[j,i] = 1.0
             
-        Adj = Adj + np.eye(self.n_joints,self.n_joints)
-        Adj = Adj[np.newaxis,:,np.newaxis,:]
-        Adj = np.repeat(np.repeat(Adj,repeats=self.n_frames,axis=2),repeats=self.n_frames,axis=0)
+        Adj = Adj + np.eye(self.n_joints, self.n_joints)
+        Adj = Adj[np.newaxis, :, np.newaxis, :]
+        Adj = np.repeat(np.repeat(Adj, repeats=self.n_frames, axis=2), repeats=self.n_frames, axis=0)
         
         for i in range(self.n_frames-1):
             for j in range(self.n_joints):
                 Adj[i,j,i+1,j] = 1.0
                 Adj[i+1,j,i,j] = 1.0
 
-        Adj = Adj.reshape(self.n_frames*self.n_joints,self.n_frames*self.n_joints)
+        Adj = Adj.reshape(self.n_frames*self.n_joints, self.n_frames*self.n_joints)
         Adj = self.normalize(Adj)
-        Adj = torch.tensor(Adj,dtype=torch.float32, requires_grad=False)
+        Adj = torch.tensor(Adj, dtype=torch.float32, requires_grad=False, device=self.device)
         self.register_buffer('Adj', Adj)
         
         self.gcns = nn.ModuleList()
@@ -298,7 +301,7 @@ class EncoderStaticPlainGCN(BaseEncoder):
 class EncoderCNN(BaseEncoder):
     
     def __init__(self, input_dim:int, layer_channels:List[int], hidden_dimension:int, 
-                 n_frames:int, n_joints:int, dropout:float, bias:bool=True) -> None:
+                 n_frames:int, n_joints:int, dropout:float, bias:bool=True, device:Union[str, torch.DeviceObjType]='cpu') -> None:
         """
         Class that implements a Convolutional Encoder.
 
@@ -310,10 +313,11 @@ class EncoderCNN(BaseEncoder):
             n_joints (int): number of body joints
             dropout (float): dropout probability
             bias (bool, optional): if True, add bias in the convolutional operations. Defaults to True.
+            device (Union[str, torch.DeviceObjType]): device on which to run the model's computations. Defaults to 'cpu'.
         """
         
         # Call the parent class constructor and build the model
-        super().__init__(input_dim, layer_channels, hidden_dimension, n_frames, n_joints, dropout, bias)
+        super().__init__(input_dim, layer_channels, hidden_dimension, n_frames, n_joints, dropout, bias, device)
         
     
     def build_model(self) -> None:

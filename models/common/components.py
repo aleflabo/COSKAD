@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 import torch
 import torch.nn as nn
@@ -8,7 +8,7 @@ from models.graph_layers.stsgcn import ST_GCNN_layer
 class BaseEncoder(nn.Module):
     
     def __init__(self, input_dim:int, layer_channels:List[int], hidden_dimension:int, 
-                 n_frames:int, n_joints:int, dropout:float, bias:bool=True) -> None:
+                 n_frames:int, n_joints:int, dropout:float, bias:bool=True, device:Union[str, torch.DeviceObjType]='cpu') -> None:
         """
         Class that implements a Graph Convolutional Encoder with learnable adjacency matrix.
 
@@ -20,6 +20,7 @@ class BaseEncoder(nn.Module):
             n_joints (int): number of body joints
             dropout (float): dropout probability
             bias (bool, optional): if True, add bias in the convolutional operations. Defaults to True.
+            device (Union[str, torch.DeviceObjType]): device on which to run the model's computations. Defaults to 'cpu'.
         """
         
         super().__init__()
@@ -32,6 +33,7 @@ class BaseEncoder(nn.Module):
         self.n_joints = n_joints
         self.dropout = dropout
         self.bias = bias
+        self.device = device
         
         # Build the model
         self.build_model()
@@ -45,7 +47,7 @@ class BaseEncoder(nn.Module):
 class Encoder(BaseEncoder):
   
     def __init__(self, input_dim:int, layer_channels:List[int], hidden_dimension:int, 
-                 n_frames:int, n_joints:int, dropout:float, bias:bool=True) -> None:
+                 n_frames:int, n_joints:int, dropout:float, bias:bool=True, device:Union[str, torch.DeviceObjType]='cpu') -> None:
         """
         Class that implements a Space-Time-Separable Graph Convolutional Encoder (STS-GCN).
 
@@ -57,11 +59,12 @@ class Encoder(BaseEncoder):
             n_joints (int): number of body joints
             dropout (float): dropout probability
             bias (bool, optional): if True, add bias in the convolutional operations. Defaults to True.
+            device (Union[str, torch.DeviceObjType]): device on which to run the model's computations. Defaults to 'cpu'.
         """
         
         # Call the parent class constructor and build the model
         super().__init__(input_dim, layer_channels, hidden_dimension, 
-                         n_frames, n_joints, dropout, bias)
+                         n_frames, n_joints, dropout, bias, device)
         
     
     def build_model(self) -> None:
@@ -106,7 +109,7 @@ class Encoder(BaseEncoder):
 class Decoder(nn.Module):
     
     def __init__(self, output_dim:int, layer_channels:List[int], hidden_dimension:int, 
-                 n_frames:int, n_joints:int, dropout:float, bias:bool=True) -> None:        
+                 n_frames:int, n_joints:int, dropout:float, bias:bool=True, device:Union[str, torch.DeviceObjType]='cpu') -> None:        
         """
         Class that implements a Space-Time-Separable Graph Convolutional Decoder (STS-GCN).
 
@@ -118,6 +121,7 @@ class Decoder(nn.Module):
             n_joints (int): number of joints of the input pose sequence
             dropout (float): dropout probability
             bias (bool, optional): whether to use bias in the convolutional layers. Defaults to True.
+            device (Union[str, torch.DeviceObjType]): device on which to run the model's computations. Defaults to 'cpu'.
         """
         
         super().__init__()
@@ -130,6 +134,7 @@ class Decoder(nn.Module):
         self.n_joints = n_joints
         self.dropout = dropout
         self.bias = bias
+        self.device = device
         
         # Build the model
         self.build_model()
@@ -172,3 +177,64 @@ class Decoder(nn.Module):
         """
         
         return self.model(X)
+    
+    
+
+class MLP(nn.Module):
+
+    def __init__(self, input_size:int, output_size:int, hidden_layers:List[int], bias=True, device:Union[str, torch.DeviceObjType]='cpu') -> None:
+        """
+        Class that implements a Multi-Layer Perceptron (MLP).
+
+        Args:
+            input_size (int): number of input features
+            output_size (int): number of output features
+            hidden_layers (List[int]): list of hidden layer dimensions
+            bias (bool, optional): whether to use bias in the linear layers. Defaults to True.
+            device (Union[str, torch.DeviceObjType], optional): device on which to run the model's computations. Defaults to 'cpu'.
+        """
+        
+        super().__init__()
+        
+        # Set the model's parameters
+        self.input_size = input_size
+        self.output_size = output_size
+        self.hidden_layers = hidden_layers
+        self.bias = bias
+        
+        # Build the model
+        self.build_model()
+        
+        
+    def build_model(self) -> None:
+        """
+        Build the model.
+        """
+        
+        layer_list = []
+
+        for next_dim in self.hidden_layers:
+
+            layer_list.append(nn.Linear(input_size, next_dim, bias=self.bias))
+            layer_list.append(nn.BatchNorm1d(next_dim))
+            layer_list.append(nn.ReLU(inplace=True))
+            input_size = next_dim
+        
+        # Add the last layer
+        layer_list.append(nn.Linear(input_size, self.output_size, bias=self.bias))
+
+        self.net = nn.Sequential(*layer_list)
+        
+
+    def forward(self, X:torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of the model.
+
+        Args:
+            X (torch.Tensor): input tensor of shape [batch_size, input_size]
+
+        Returns:
+            torch.Tensor: output tensor of shape [batch_size, output_dim]
+        """
+        
+        return self.net(X)
