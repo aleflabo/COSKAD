@@ -127,12 +127,16 @@ additional flag you can use:
 
 ## Citation
 ```
-@article{flaborea2024coskad,
-  title={Contracting Skeletal Kinematics for Human-Related Video Anomaly Detection},
-  author={Flaborea, Alessandro and D'Amely di Melendugno, Guido Maria and D'Arrigo, Stefano and Sterpa, Marco Aurelio and Sampieri, Alessio and Galasso, Fabio},
-  journal={Pattern Recognition},
-  year={2024},
-  publisher={Elsevier}
+@article{FLABOREA2024110817,
+title = {Contracting skeletal kinematics for human-related video anomaly detection},
+journal = {Pattern Recognition},
+pages = {110817},
+year = {2024},
+issn = {0031-3203},
+doi = {https://doi.org/10.1016/j.patcog.2024.110817},
+url = {https://www.sciencedirect.com/science/article/pii/S0031320324005685},
+author = {Alessandro Flaborea and Guido Maria D’Amely {di Melendugno} and Stefano D’Arrigo and Marco Aurelio Sterpa and Alessio Sampieri and Fabio Galasso},
+keywords = {Anomaly detection, Open set recognition, Hyperbolic geometry, Kinematic skeleton, Graph convolutional networks},
 }
 ```
 
