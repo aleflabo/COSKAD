@@ -127,7 +127,7 @@ additional flag you can use:
 
 ## Citation
 ```
-@article{munjal2023query,
+@article{flaborea2024coskad,
   title={Contracting Skeletal Kinematics for Human-Related Video Anomaly Detection},
   author={Flaborea, Alessandro and D'Amely di Melendugno, Guido Maria and D'Arrigo, Stefano and Sterpa, Marco Aurelio and Sampieri, Alessio and Galasso, Fabio},
   journal={Pattern Recognition},
