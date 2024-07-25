@@ -17,7 +17,7 @@ _Alessandro Flaborea*, Guido D'Amely*, Stefano D'Arrigo*, Marco Aurelio Sterpa, 
 </p>
 
 
-The official PyTorch implementation of the paper [**Contracting Skeletal Kinematics for Human-Related Video Anomaly Detection**](https://arxiv.org/abs/2301.09489).
+The official PyTorch implementation of the paper [**Contracting Skeletal Kinematics for Human-Related Video Anomaly Detection**](https://www.sciencedirect.com/science/article/pii/S0031320324005685), published in the Pattern Recognition journal.
 
 <!-- Visit our [**webpage**](https://www.pinlab.org/coskad) for more details. -->
 
@@ -88,8 +88,7 @@ conda activate coskad
 ```
 
 ### Datasets
-Send a mail to flaborea@di.uniroma1.it to have the datasets. (We're planning to uploading them to a publicly available repository)
-
+Please take a look at the [MoCoDAD](https://github.com/aleflabo/MoCoDAD) repo for more details.
 
 ### **Training** 
 
@@ -125,4 +124,15 @@ python eval_COSKAD.py --config /args.exp_dir/args.dataset_choice/args.dir_name/c
 additional flag you can use:
 - use_hr: False -> just for test. Use the entire version of the dataset or the Human-Related one.
 
+
+## Citation
+```
+@article{munjal2023query,
+  title={Contracting Skeletal Kinematics for Human-Related Video Anomaly Detection},
+  author={Flaborea, Alessandro and D'Amely di Melendugno, Guido Maria and D'Arrigo, Stefano and Sterpa, Marco Aurelio and Sampieri, Alessio and Galasso, Fabio},
+  journal={Pattern Recognition},
+  year={2024},
+  publisher={Elsevier}
+}
+```
 
