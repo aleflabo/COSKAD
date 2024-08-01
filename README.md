@@ -68,6 +68,10 @@ python eval_COSKAD.py --config /args.exp_dir/args.dataset_choice/args.dir_name/c
 additional flag you can use:
 - use_hr: False -> just for test. Use the entire version of the dataset or the Human-Related one.
 
+### Visualization
+
+We provide the code to visualize frames, poses and anomaly scores. Follow the instructions in [visualize](/visualize) for further details.
+
 
 ## Citation
 ```
