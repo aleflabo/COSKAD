@@ -23,62 +23,6 @@ The official PyTorch implementation of the paper [**Contracting Skeletal Kinemat
 
 ![teaser](assets/model.png)
 
-## Content
-```
-.
-├── assets
-│   └── model.png
-├── config
-│   ├── Avenue
-│   │   └── encoder.yaml
-│   ├── STC
-│   │   ├── euclidean_encoder.yaml
-│   │   └── hyperbolic_encoder.yaml
-│   └── UBnormal
-│       ├── euclidean_autoencoder.yaml
-│       ├── euclidean_encoder.yaml
-│       ├── hyperbolic_encoder.yaml
-│       └── spherical_vae.yaml
-├── environment.yml
-├── eval_COSKAD.py
-├── models
-│   ├── common
-│   │   ├── alternative_components.py
-│   │   ├── components.py
-│   ├── euclidean_autoencoder.py
-│   ├── euclidean_encoder_dynamicCenter.py
-│   ├── euclidean_encoder_staticCenter.py
-│   ├── gcae
-│   │   ├── gcn.py
-│   │   ├── learnable_gcn.py
-│   │   ├── stgcn.py
-│   │   └── stsgcn.py
-│   ├── hyperbolic_encoder.py
-│   ├── spherical_vae.py
-│   ├── stsae
-│   │   └── stsae_hidden_hypersphere.py
-│   ├── stse
-│   │   └── stse_hidden_hypersphere.py
-│   └── stsve
-│       └── stsve_hidden_hypersphere.py
-├── README.md
-├── train_COSKAD.py
-└── utils
-    ├── argparser.py
-    ├── data.py
-    ├── dataset.py
-    ├── dataset_utils.py
-    ├── eval_utils.py
-    ├── get_robust_data.py
-    ├── hyperbolic.py
-    ├── hyper_math.py
-    ├── __init__.py
-    ├── model_utils.py
-    ├── pose_dataset_mp.py
-    ├── preprocessing.py
-    └── tools.py
-
-```
 
 ## Setup
 ### Environment
